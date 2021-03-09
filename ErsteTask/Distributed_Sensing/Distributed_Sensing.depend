@@ -1,8 +1,0 @@
-# depslib dependency file v1.0
-1614787892 source:/home/fhtw/Desktop/Systementwicklung_FHTechnikum/ErsteTask/Distributed_Sensing/main.c
-	<stdio.h>
-	<pthread.h>
-	<time.h>
-	<stdlib.h>
-	<unistd.h>
-
