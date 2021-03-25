@@ -38,25 +38,39 @@ struct SensT sensor1;
 key_t SomeKey;
 SomeKey = ftok(".", 'x');
 int msqid=msgget(SomeKey, IPC_CREAT);
-
-pid_t pid;
-pid=fork();      //Diese beide Zeile, soll ich  unten bei if-Machen ?
-	if( strcmp(argv[1], "-H") == 0 || strcmp(argv[1], "-T") == 0){
-		if(pid >= 0){ //new, child process
+pid_t pid1,pid2,pid3,pid4,pid5,pid6;
+	switch (*argv[1]){
+	case 'H':
+		pid1=fork();
+		if(pid1 == 0){ //new, child process
 			if(msqid >=0){
 				tempSens(&sensor1);
-				printf("%f",sensor1.temp);
+				printf("%f\n",sensor1.temp);
 				}
 			else{
 				printf("msgget error");
 				}
 		}
-		else{
+		else if(pid1 == -1){
 			printf("Child process not created");
+		} break;
+	case 'T':		
+		pid2=fork();
+		if(pid2 == 0){ //new, child process
+			if(msqid >=0){
+				tempSens(&sensor1);
+				printf("%f\n",sensor1.temp);
+				}
+			else{
+				printf("msgget error");
+				}
 		}
-	}else{
-	     printf("dkwoadka");
+		else if(pid2 == -1){
+			printf("Child process not created");
+		} break;
+	default:
+		printf("Gabim");
+		break;
 	}
-
 return 0;
 }
