@@ -78,7 +78,6 @@ int main (int argc, char *argv[])
 					humiditySens (humidsensor);
 					sprintf(buf.mtext,"%d",humidsensor->humid);
 					//strcpy(buf.mtext,humidsensor->humid);
-					printf("%s\n",buf.mtext);
 					buf.mtype=3;
 					if (msgsnd (msqid, &buf, strlen(buf.mtext), 0) == -1) {
 						perror ("msgsnd");

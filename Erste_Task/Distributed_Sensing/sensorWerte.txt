@@ -1,0 +1,1 @@
+Temperatur in Celsius: 12.850000 
