@@ -1,2 +1,0 @@
-Pressure in ATM: 2.000000 
-Temperatur in Celsius: -3.150000 

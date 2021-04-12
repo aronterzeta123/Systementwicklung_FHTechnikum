@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <stdbool.h>
 struct my_msgbuf {
    long mtype;
    char mtext[200];
@@ -53,6 +54,9 @@ int sum2=0;
 int sum1=0;
 int sum=0;
 pid_t pid1,pid2,pid3;
+bool cparameter=false;
+bool fparameter=false;
+bool aparameter=false;
 if (msqid >= 0) {
 	FILE *fp,*svg;
 	fp = fopen("sensorWerte.txt", "w+");
@@ -65,6 +69,16 @@ if (msqid >= 0) {
       while ( (ca = getopt (argc, argv, "cfa")) != -1)
                 switch (ca) {
                 case 'c':
+	cparameter=true;
+		break;
+		case 'f':
+	fparameter=true;
+		break;
+		case 'a':
+	aparameter=true;
+		break;
+	}
+	if(cparameter){
 	pid1=fork();
 	if(pid1>0){
 	for(;;){
@@ -78,8 +92,8 @@ if (msqid >= 0) {
 		signal(SIGINT,cntrl_c_handler);
 		}
 	}	
-		break;
-                case 'f':
+	}
+	if(fparameter){
 	pid2=fork();
 	if(pid2>0){
 	for(;;){
@@ -93,8 +107,8 @@ if (msqid >= 0) {
 		signal(SIGINT,cntrl_c_handler);
 		}
 	}
-	break;
-                case 'a':
+	}
+	if(aparameter){
 	pid3=fork();
 	if(pid3>0){
 	for(;;){
@@ -108,11 +122,13 @@ if (msqid >= 0) {
 		signal(SIGINT,cntrl_c_handler);
 		}
 		}
-		
-		break;
+	}
+	if(cparameter && fparameter){
+	printf("Not allowed\n");
+	exit(1);
 	}
 	fclose(fp);
-	fclose(svg);		
+	fclose(svg);
 	} else {
 		perror ("msgget");
 	}

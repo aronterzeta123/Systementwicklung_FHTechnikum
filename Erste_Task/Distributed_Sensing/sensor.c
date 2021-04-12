@@ -39,7 +39,7 @@ void *tempSens (void *ptr)
 	tempsensor->maxTemp = 313;
 	tempsensor->temp = (rand() % (tempsensor->maxTemp - tempsensor->minTemp + 1)) + tempsensor->minTemp;
 	tempsensor->mtype = 1;
-	return ""; //Ich wurde vom Compiler gezwungen, dieses return-wert zu definieren, sonst bekomme ich ein Warning "control reaches end of non-void function"
+	return NULL; //Ich wurde vom Compiler gezwungen, dieses return-wert zu definieren, sonst bekomme ich ein Warning "control reaches end of non-void function"
 
 }
 void *pressSens (void *ptr)
