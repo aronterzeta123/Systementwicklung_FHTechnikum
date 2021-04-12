@@ -7,6 +7,7 @@
 #include <sys/msg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
 struct my_msgbuf {
    long mtype;
    char mtext[200];
@@ -38,6 +39,8 @@ void *tempSens (void *ptr)
 	tempsensor->maxTemp = 313;
 	tempsensor->temp = (rand() % (tempsensor->maxTemp - tempsensor->minTemp + 1)) + tempsensor->minTemp;
 	tempsensor->mtype = 1;
+	return ""; //Ich wurde vom Compiler gezwungen, dieses return-wert zu definieren, sonst bekomme ich ein Warning "control reaches end of non-void function"
+
 }
 void *pressSens (void *ptr)
 {
@@ -48,6 +51,7 @@ void *pressSens (void *ptr)
 	presssensor->maxPress = 140000;
 	presssensor->press = (rand() % (presssensor->maxPress - presssensor->minPress + 1)) + presssensor->minPress;
 	presssensor->mtype = 2;
+	return ""; // Ich wurde vom Compiler gezwungen, dieses return-wert zu definieren, sonst bekomme ich ein Warning "control reaches end of non-void function"
 }
 void *humiditySens (void *ptr)
 {
@@ -57,14 +61,23 @@ void *humiditySens (void *ptr)
 	humiditysensor->maxHumid = 100;
 	humiditysensor->humid = (rand() % (humiditysensor->maxHumid - humiditysensor->minHumid + 1)) + humiditysensor->minHumid;
 	humiditysensor->mtype = 3;
+	return ""; //Ich wurde vom Compiler gezwungen, dieses return-wert zu definieren, sonst bekomme ich ein Warning "control reaches end of non-void function"
+
+}
+static int msqid=0;
+
+void cntrl_c_handler ()
+{
+        msgctl(msqid, IPC_RMID, NULL);
+        exit(EXIT_SUCCESS);
 }
 
 int main (int argc, char *argv[])
 {
 	key_t SomeKey;
 	SomeKey = ftok ("/etc/hostname", 'b');
-	int msqid = msgget (SomeKey, IPC_CREAT | 0666);
-	pid_t pid1, pid2, pid3, pid4, pid5, pid6;
+	msqid = msgget (SomeKey, IPC_CREAT | 0666);
+	pid_t pid1, pid2, pid3;
 	int c = 0;
 	while ( (c = getopt (argc, argv, "HTP")) != -1)
 		switch (c) {
@@ -86,7 +99,7 @@ int main (int argc, char *argv[])
 					}
 
 				}
-
+				signal(SIGINT,cntrl_c_handler);
 				sleep(10);
 			}
 			}
@@ -109,6 +122,7 @@ int main (int argc, char *argv[])
 						printf ("Data sent: %d\n", tempsensor->temp);
 					}
 				}
+				signal(SIGINT,cntrl_c_handler);
 				sleep(10);
 			}
 			}
@@ -129,6 +143,7 @@ int main (int argc, char *argv[])
 						printf ("Data sent: %d\n", presssensor->press);
 					}
 				}
+				signal(SIGINT,cntrl_c_handler);
 				sleep(10);
 			}
 			}

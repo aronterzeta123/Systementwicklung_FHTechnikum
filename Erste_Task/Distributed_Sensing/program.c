@@ -27,7 +27,7 @@ typedef struct SensT{
 
 static int msqid=0;
 
-void cntrl_c_handler (int dummy)
+void cntrl_c_handler ()
 {
 	msgctl(msqid, IPC_RMID, NULL);
 	exit(EXIT_SUCCESS);
@@ -54,18 +54,19 @@ int sum1=0;
 int sum=0;
 pid_t pid1,pid2,pid3;
 if (msqid >= 0) {
+	FILE *fp,*svg;
+	fp = fopen("sensorWerte.txt", "w+");
+	svg= fopen("sensorWerte.svg", "w+");
+	if ( fp == NULL || svg == NULL)
+    {
+        printf( "Could not open file sensorWerte.txt/sensorWerte.svg" ) ;
+        return 1;
+    }
       while ( (ca = getopt (argc, argv, "cfa")) != -1)
                 switch (ca) {
                 case 'c':
 	pid1=fork();
 	if(pid1>0){
-	FILE *fp;
-	fp = fopen("sensorWerte.txt", "w+") ;
-	if ( fp == NULL )
-    {
-        printf( "Could not open file sensorWerte.txt" ) ;
-        return 1;
-    }
 	for(;;){
 	if (msgrcv(msqid, &buf, sizeof(buf.mtext), 1, 0) == -1) {
          perror("msgrcv");
@@ -73,7 +74,7 @@ if (msqid >= 0) {
          }	
 		sum=sum+atoi(buf.mtext);
 		counter++;
-		if(counter%10==0){meantempcelsius=sum/10-273.15;printf("Mean Value of temp for 10Values in Celcius is: %f\n",meantempcelsius);fprintf(fp,"Temperatur in Celsius: %f \n",meantempcelsius);fclose(fp);sum=0;}
+		if(counter%10==0){meantempcelsius=sum/10-273.15;printf("Mean Value of temp for 10Values in Celcius is: %f\n",meantempcelsius);fprintf(fp,"Temperatur in Celsius: %f \n",meantempcelsius);sum=0;}
 		signal(SIGINT,cntrl_c_handler);
 		}
 	}	
@@ -81,13 +82,6 @@ if (msqid >= 0) {
                 case 'f':
 	pid2=fork();
 	if(pid2>0){
-	FILE *fp1;
-	fp1 = fopen("sensorWerte.txt", "w+") ;
-	if ( fp1 == NULL )
-    {
-        printf( "Could not open file sensorWerte.txt" ) ;
-        return 1;
-    }
 	for(;;){
 	if (msgrcv(msqid, &buf2, sizeof(buf2.mtext), 1, 0) == -1) {
          perror("msgrcv");
@@ -95,7 +89,7 @@ if (msqid >= 0) {
          }	
 		sum1=sum1+atoi(buf2.mtext);
 		counter1++;
-		if(counter1%10==0){meantempfahrenheit=(sum1/10-273.15)*9/5+32;printf("Mean Value of temp for 10Values in Fahrenheit is: %f\n",meantempfahrenheit);fprintf(fp1,"Temperatur in Fahrenheit: %f \n",meantempfahrenheit);fclose(fp1);sum1=0;}
+		if(counter1%10==0){meantempfahrenheit=(sum1/10-273.15)*9/5+32;printf("Mean Value of temp for 10Values in Fahrenheit is: %f\n",meantempfahrenheit);fprintf(fp,"Temperatur in Fahrenheit: %f \n",meantempfahrenheit);sum1=0;}
 		signal(SIGINT,cntrl_c_handler);
 		}
 	}
@@ -103,13 +97,6 @@ if (msqid >= 0) {
                 case 'a':
 	pid3=fork();
 	if(pid3>0){
-	FILE *fp2;
-	fp2 = fopen("sensorWerte.txt", "w+") ;
-	if ( fp2 == NULL )
-    {
-        printf( "Could not open file sensorWerte.txt" ) ;
-        return 1;
-    }
 	for(;;){
 	if (msgrcv(msqid, &buf1, sizeof(buf1.mtext), 2, 0) == -1) {
          perror("msgrcv");
@@ -117,12 +104,15 @@ if (msqid >= 0) {
          }	
 		sum2=sum2+atoi(buf1.mtext);
 		counter2++;
-		if(counter2%10==0){meanatm=(sum2/10)/101325;printf("Mean Value of Pressure for 10Values in ATM is: %f\n",meanatm);fprintf(fp2,"Pressure in ATM: %f \n",meanatm);fclose(fp2);sum2=0;}
+		if(counter2%10==0){meanatm=(sum2/10)/101325;printf("Mean Value of Pressure for 10Values in ATM is: %f\n",meanatm);fprintf(fp,"Pressure in ATM: %f \n",meanatm);fprintf(svg,"<svg></svg>");sum2=0;}
 		signal(SIGINT,cntrl_c_handler);
 		}
 		}
+		
 		break;
-	}	
+	}
+	fclose(fp);
+	fclose(svg);		
 	} else {
 		perror ("msgget");
 	}
