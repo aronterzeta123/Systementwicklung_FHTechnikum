@@ -74,12 +74,13 @@ void cntrl_c_handler ()
 
 int main (int argc, char *argv[])
 {
+	char *random_sleep=NULL;
 	key_t SomeKey;
 	SomeKey = ftok ("/etc/hostname", 'b');
 	msqid = msgget (SomeKey, IPC_CREAT | 0666);
 	pid_t pid1, pid2, pid3;
-	int c = 0;
-	while ( (c = getopt (argc, argv, "HTP")) != -1)
+	int c=0;
+	while ( (c = getopt (argc, argv, "HTPd")) != -1)
 		switch (c) {
 		case 'H':
 			pid1 = fork();
@@ -95,12 +96,12 @@ int main (int argc, char *argv[])
 					if (msgsnd (msqid, &buf, strlen(buf.mtext), 0) == -1) {
 						perror ("msgsnd");
 					} else {
-						printf ("Data sent: %d\n", humidsensor->humid);
+						printf ("Humidity: %d\n", humidsensor->humid);
 					}
 
 				}
 				signal(SIGINT,cntrl_c_handler);
-				sleep(10);
+				sleep(atoi(random_sleep));
 			}
 			}
 			break;
@@ -119,11 +120,11 @@ int main (int argc, char *argv[])
 					if (msgsnd (msqid, &buf1, strlen(buf1.mtext), 0) == -1) {
 						perror ("msgsnd");
 					} else {
-						printf ("Data sent: %d\n", tempsensor->temp);
+						printf ("Temp in Kelvin: %d\n", tempsensor->temp);
 					}
 				}
 				signal(SIGINT,cntrl_c_handler);
-				sleep(10);
+				sleep(atoi(random_sleep));
 			}
 			}
 			break;
@@ -140,13 +141,16 @@ int main (int argc, char *argv[])
 					if (msgsnd (msqid, &buf2, strlen(buf2.mtext), 0) == -1) {
 						perror ("msgsnd");
 					} else {
-						printf ("Data sent: %d\n", presssensor->press);
+						printf ("Druck in Pa: %d\n", presssensor->press);
 					}
 				}
 				signal(SIGINT,cntrl_c_handler);
-				sleep(10);
+				sleep(atoi(random_sleep));
 			}
 			}
+			break;
+		case 'd':
+			random_sleep=argv[2];
 			break;
 		default:
 			printf ("You should give an argument: -H, -T, -P");
