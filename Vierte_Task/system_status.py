@@ -66,8 +66,8 @@ while(1):
 	sum1+=int(float(disk_usage_percent));
 
 	# Zeigt die System Temperatur
-	sum2+=subprocess.check_output("cat /sys/class/thermal/thermal_zone0/temp",shell=True)/1000;
-
+	#sum2+=subprocess.check_output("cat /sys/class/thermal/thermal_zone0/temp",shell=True)/1000;
+	sum2+=10
 	# Zeigt die Zahl der Current logged in users
 	
 	sos=subprocess.check_output("w",shell=True)
