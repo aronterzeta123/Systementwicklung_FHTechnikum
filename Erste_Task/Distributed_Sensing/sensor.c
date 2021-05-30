@@ -94,7 +94,8 @@ int main (int argc, char *argv[])
 					//strcpy(buf.mtext,humidsensor->humid);
 					buf.mtype=3;
 					if (msgsnd (msqid, &buf, strlen(buf.mtext), 0) == -1) {
-						perror ("msgsnd");
+						printf("Message Queue deleted from Program Task");
+						exit(1);
 					} else {
 						printf ("Humidity: %d\n", humidsensor->humid);
 					}
@@ -118,7 +119,8 @@ int main (int argc, char *argv[])
 					sprintf(buf1.mtext,"%d",tempsensor->temp);
 					buf1.mtype=1;
 					if (msgsnd (msqid, &buf1, strlen(buf1.mtext), 0) == -1) {
-						perror ("msgsnd");
+						printf("Message Queue deleted from Program Task");
+						exit(1);
 					} else {
 						printf ("Temp in Kelvin: %d\n", tempsensor->temp);
 					}
@@ -139,7 +141,8 @@ int main (int argc, char *argv[])
 					sprintf(buf2.mtext,"%d",presssensor->press);
 					buf2.mtype=2;
 					if (msgsnd (msqid, &buf2, strlen(buf2.mtext), 0) == -1) {
-						perror ("msgsnd");
+						printf("Message Queue deleted from Program Task");
+						exit(1);
 					} else {
 						printf ("Druck in Pa: %d\n", presssensor->press);
 					}

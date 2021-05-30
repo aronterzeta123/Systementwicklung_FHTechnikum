@@ -1,1 +1,18 @@
-https://github.com/aronterzeta123/Systementwicklung_FHTechnikum.git
+Erste Task:
+
+Consists of two programs. The first one is "sensor":
+
+you can call it using "./sensor" and it needs at least two arguments(obligatory). The first argument is "-d" with which you decide after how many seconds the sensor generates data. The other arguments can be "-H",which generates random humidity values,  "-T", which generates random temperature values, "-P", which generates random pressure values. You can use but also all combinations of these arguments (-H,-T,-P).
+If you dont use the argument "-d", then the program will be terminated without doing anything.
+
+
+The second program is "program":
+
+you can call it using "./program" and it needs at least one argument, "-a" for convert the pressure from Pascal to Bar, "-c" to convert the temperature from Kelvin to Celcius, "-f" to convert the temperature from Kelvin to Fahrenheit. These values gets the program from a message queue, where the "sensor"-Program saves the generated values. 
+The values will be saved then to a .txt file where the user can everytime see and check the datas, and a graph in .svg file will be created for each different art of value(Fahrenheit,Celsius, Bar).
+
+
+The program "delsvg.c" deletes a "</svg>" more which it comes when the program terminated with CTRL+C because the signal-handler will be called two times 
+
+
+Github repository:  https://github.com/aronterzeta123/Systementwicklung_FHTechnikum.git

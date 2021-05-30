@@ -31,30 +31,31 @@ static int msqid=0;
 bool cparameter=false;
 bool fparameter=false;
 bool aparameter=false;
+static int arguments=0;
 static FILE *fp,*celsiussvg,*fahrenheitsvg,*presssvg = NULL;
 void cntrl_c_handler ()
 {
 	msgctl(msqid, IPC_RMID, NULL);
 	if(cparameter && !fparameter){
-	fprintf(celsiussvg,"</svg>");
+	fprintf(celsiussvg,"</svg> ");
 	fclose(celsiussvg);
 	}
 	if(fparameter && !cparameter){	
-	fprintf(fahrenheitsvg,"</svg>");	
+	fprintf(fahrenheitsvg,"</svg> ");	
 	fclose(fahrenheitsvg);
 	}
 	if(aparameter){
-	fprintf(presssvg,"</svg>");	
+	fprintf(presssvg,"</svg> ");	
 	fclose(presssvg);
 	}
 	fclose(fp);
-	exit(EXIT_SUCCESS);
 }
 
 
 int main(int argc, char *argv[]){
 
 key_t SomeKey;
+signal(SIGINT,cntrl_c_handler);
 SomeKey = ftok("/etc/hostname", 'b');
 msqid=msgget(SomeKey, IPC_CREAT | 0666);
 int ca=0;
@@ -71,6 +72,9 @@ int sum2=0;
 int sum1=0;
 int sum=0;
 pid_t pid1,pid2,pid3;
+celsiussvg= fopen("tempWerteCelsius.svg", "w+");
+fahrenheitsvg= fopen("tempWerteFahrenheit.svg", "w+");
+presssvg= fopen("pressWerte.svg", "w+");
 if (msqid >= 0) {
 	fp = fopen("sensorWerte.txt", "w+");
 	if ( fp == NULL)
@@ -82,7 +86,7 @@ if (msqid >= 0) {
                 switch (ca) {
                 case 'c':
 	cparameter=true;
-	celsiussvg= fopen("tempWerteCelsius.svg", "w+");
+	arguments++;
 	if ( celsiussvg == NULL)
     {
         printf( "Could not open file tempWerteCelsius.svg" ) ;
@@ -91,7 +95,7 @@ if (msqid >= 0) {
 		break;
 		case 'f':
 	fparameter=true;
-	fahrenheitsvg= fopen("tempWerteFahrenheit.svg", "w+");
+	arguments++;
 	if ( fahrenheitsvg == NULL)
     {
         printf( "Could not open file tempWerteFahrenheit.svg" ) ;
@@ -100,7 +104,7 @@ if (msqid >= 0) {
 		break;
 		case 'a':
 	aparameter=true;
-	presssvg= fopen("pressWerte.svg", "w+");
+	arguments++;
 	if ( presssvg == NULL)
     {
         printf( "Could not open file pressWerte.svg" ) ;
@@ -115,7 +119,7 @@ if (msqid >= 0) {
 	fprintf(celsiussvg,"<?xml version=\"1.0\" encoding=\"UTF-8\"?> <svg width=\"700px\" height=\"400px\" viewBox=\"0 0 1200 400\">");
 	for(;;){
 	if (msgrcv(msqid, &buf, sizeof(buf.mtext), 1, 0) == -1) {
-         perror("msgrcv");
+         printf("Message Queue deleted from sensor Task");
          exit(1);
 	}
 		sum=sum+atoi(buf.mtext);
@@ -127,7 +131,6 @@ if (msqid >= 0) {
 		fprintf(celsiussvg, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%f\" stroke=\"blue\" stroke-width=\"3px\" />",100+(i*10),100,100+(i*10),fabs(meantempcelsius));
 		i++;
 		}
-		signal(SIGINT,cntrl_c_handler);
 		}
 	}
 	}
@@ -138,7 +141,7 @@ if (msqid >= 0) {
 	fprintf(fahrenheitsvg,"<?xml version=\"1.0\" encoding=\"UTF-8\"?> <svg width=\"700px\" height=\"400px\" viewBox=\"0 0 1200 400\">");
 	for(;;){
 	if (msgrcv(msqid, &buf2, sizeof(buf2.mtext), 1, 0) == -1) {
-         perror("msgrcv");
+         printf("Message Queue deleted from sensor Task");
          exit(1);
          }	
 		sum1=sum1+atoi(buf2.mtext);
@@ -152,7 +155,6 @@ if (msqid >= 0) {
                 i++;
 		
 		}
-		signal(SIGINT,cntrl_c_handler);
 		}
 	}
 	}
@@ -163,7 +165,7 @@ if (msqid >= 0) {
 	fprintf(presssvg,"<?xml version=\"1.0\" encoding=\"UTF-8\"?> <svg width=\"700px\" height=\"400px\" viewBox=\"0 0 1200 400\">");
 	for(;;){
 	if (msgrcv(msqid, &buf1, sizeof(buf1.mtext), 2, 0) == -1) {
-         perror("msgrcv");
+         printf("Message Queue deleted from sensor Task");
          exit(1);
          }	
 		sum2=sum2+atoi(buf1.mtext);
@@ -176,7 +178,6 @@ if (msqid >= 0) {
 		fprintf(presssvg, "<line x1=\"%d\" y1=\"%d\" x2=\"%d\" y2=\"%f\" stroke=\"blue\" stroke-width=\"3px\" />",100+(i*10),100,100+(i*10),fabs(meanatm));
                 i++;
 		}
-		signal(SIGINT,cntrl_c_handler);
 		}
 		}
 	}
@@ -187,7 +188,6 @@ if (msqid >= 0) {
 	} else {
 		perror ("msgget");
 	}
-	
 return 0;
 
 }
